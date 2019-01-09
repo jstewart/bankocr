@@ -1,6 +1,7 @@
 (ns bankocr.core)
 
-(defn foo
-  "I don't do a whole lot."
-  [x]
-  (println x "Hello, World!"))
+(defn cell->number
+  "reads a number from a 3x3 cell"
+  [cell]
+  ;; For now we just fail the test
+  false)
