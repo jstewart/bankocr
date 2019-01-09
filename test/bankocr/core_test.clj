@@ -1,4 +1,4 @@
-(ns bankocr.user-story-1-test
+(ns bankocr.core-test
   (:require [clojure.test :refer [deftest testing is are]]
             [bankocr.core :refer [cell->number]]))
 
