@@ -1,5 +1,6 @@
 (ns bankocr.core-test
-  (:require [clojure.test :refer [deftest testing is are]]
+  (:require [clojure.spec.test.alpha :as stest]
+            [clojure.test :refer [deftest testing is are]]
             [bankocr.core :refer [cell->number]]))
 
 (defn textual-to-cell
@@ -53,8 +54,7 @@
                 "|_|"
                 " _|"))
 
-(textual-to-cell zero)
-
+(stest/instrument `cell->number)
 
 ;; Tests to ensure that numbers 0-9 are correctly identified
 (deftest cell->number_test
