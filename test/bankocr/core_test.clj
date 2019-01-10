@@ -7,6 +7,7 @@
   [textual]
   (->> textual
        seq
+       (map str)
        (partition 3)))
 
 ;; Textual representations of numbers (OCR cell)
@@ -51,6 +52,9 @@
 (def nine  (str " _ "
                 "|_|"
                 " _|"))
+
+(textual-to-cell zero)
+
 
 ;; Tests to ensure that numbers 0-9 are correctly identified
 (deftest cell->number_test
