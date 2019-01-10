@@ -1,15 +1,8 @@
 (ns bankocr.core-test
   (:require [clojure.spec.test.alpha :as stest]
+            [clojure.spec.alpha :as s]
             [clojure.test :refer [deftest testing is are]]
-            [bankocr.core :refer [cell->number]]))
-
-(defn textual-to-cell
-  "turns a `textual` representation of a digit into a 3x3 cell"
-  [textual]
-  (->> textual
-       seq
-       (map str)
-       (partition 3)))
+            [bankocr.core :refer [cell->number] :as c]))
 
 ;; Textual representations of numbers (OCR cell)
 ;; Attempts made to line the strings up may have the best results
@@ -54,6 +47,22 @@
                 "|_|"
                 " _|"))
 
+
+(s/def ::textual-digit string?)
+
+(defn textual-to-cell
+  "turns a `textual` representation of a digit into a 3x3 cell"
+  [textual]
+  (->> textual
+       seq
+       (map str)
+       (partition 3)))
+
+(s/fdef textual-to-cell
+  :args (s/cat :textual ::textual-digit)
+  :ret ::c/cell)
+
+(stest/instrument `textual-to-cell)
 (stest/instrument `cell->number)
 
 ;; Tests to ensure that numbers 0-9 are correctly identified
@@ -96,4 +105,10 @@
 
   (testing "detecting a nine"
     (is (= 9 (cell->number
-              (textual-to-cell nine))))))
+              (textual-to-cell nine)))))
+
+  (testing "detecting garbage"
+    (is (nil? (cell->number
+               '(("" "" "")
+                 ("" "" "")
+                 ("" "" "")))))))
