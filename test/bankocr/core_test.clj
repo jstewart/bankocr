@@ -124,5 +124,7 @@
         (is (= 3 (count (first partitioned))))
         (is (= 27 (count (ffirst partitioned)))))))
   (testing "with an invalid file"
-    ;; just flunk for now
-    (is false)))
+    (let [partitioned (partition-file
+                       (io/resource "fixtures/invalid.txt"))]
+      (testing "is an empty list"
+        (is (empty? partitioned))))))

@@ -29,12 +29,8 @@
   :ret (s/or :nil nil?
              :numeric number?)
   :fn (s/or :nil nil?
-            :range (s/and #(>= (:ret %) 5)
-                          #(<= (:ret %) 9))))
+            :range #(<= 0 (:ret %) 9)))
 
-;; Read file into lines
-;; Partition by blank line
-;; Should be 3x27 after partitioning
 (s/def ::reader-type
   (fn [path]
     (try
@@ -48,6 +44,10 @@
 (s/def ::account-numbers
   (s/coll-of ::account-number-line))
 
+(s/def ::empty-list
+  (s/and seq?
+         empty?))
+
 (defn partition-file
   "partitions `file` into textual account
   number representations"
@@ -60,4 +60,6 @@
 
 (s/fdef partition-file
   :args (s/cat :file ::reader-type)
-  :ret ::account-numbers)
+  :ret (s/or
+        :account-numbers ::account-numbers
+        :invalid ::empty-list))
