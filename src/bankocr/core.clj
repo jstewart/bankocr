@@ -8,6 +8,21 @@
 (s/def ::cell
   (s/coll-of ::cell-row :count 3))
 
+(s/def ::cell-line
+  (s/coll-of ::cell :count 9))
+
+(s/def ::reader-type
+  (fn [path]
+    (try
+      (io/reader path)
+      true
+      (catch Exception _ false))))
+
+(s/def ::account-numbers
+  (s/coll-of
+   (s/and string? #(= 9 (count %)))))
+
+
 (defn cell->number
   "identifies a number from a 3x3 cell of characters"
   [cell]
@@ -31,12 +46,6 @@
   :fn (s/or :nil nil?
             :range #(<= 0 (:ret %) 9)))
 
-(s/def ::reader-type
-  (fn [path]
-    (try
-      (io/reader path)
-      true
-      (catch Exception _ false))))
 
 (s/def ::account-number-line
   (s/coll-of string? :count 3))
@@ -70,9 +79,12 @@
   "
   [line]
   (->> line
-       (map #(partition 3 %))
-       (map #(map str %))
+       (map (fn [cell]
+              (->> cell
+                   (partition 3)
+                   (map #(map str %)))))
        (apply map list)))
+
 
 (s/fdef line->cells
   :args (s/cat
@@ -80,10 +92,6 @@
   :ret (s/or
         :cell ::cell
         :invalid ::empty-list))
-
-(s/def ::account-numbers
-  (s/coll-of
-   (s/and string? #(= 9 (count %)))))
 
 (defn file->account-numbers
   "processes a `file` into a collection of account numbers"
@@ -95,3 +103,11 @@
   :ret (s/or
         :account-numbers ::account-numbers
         :invalid ::empty-list))
+
+(comment
+     (->> "fixtures/accounts.txt"
+                  io/resource
+                  partition-file
+                  first
+                  line->cells
+                  ))

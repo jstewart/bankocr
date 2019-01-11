@@ -63,9 +63,10 @@
   :args (s/cat :textual ::textual-digit)
   :ret ::c/cell)
 
-(stest/instrument [`textual-to-cell
-                   `cell->number
-                   `partition-file])
+(stest/instrument [`c/textual-to-cell
+                   `c/cell->number
+                   `c/partition-file
+                   `c/file->account-numbers])
 
 ;; Tests to ensure that numbers 0-9 are correctly identified
 (deftest cell->number_test
@@ -115,7 +116,7 @@
                  ("" "" "")
                  ("" "" "")))))))
 
-(deftest parition-file-test
+(deftest partition-file-test
   (testing "with a valid file"
     (let [partitioned (c/partition-file
                       (io/resource "fixtures/accounts.txt"))]
@@ -135,10 +136,10 @@
                    io/resource
                    c/partition-file
                    first)]
+      (prn line)
       (testing "creates 3x3 cells representing digits"
-        (s/explain ::c/cell (c/line->cells line))
         (is (s/valid?
-             ::c/cell (c/line->cells line))))))
+             ::c/cell-line (c/line->cells line))))))
 
   (testing "with an invalid account number line"
     (let [invalid-line [[" " "_" " "] ["" 1]]]
