@@ -129,12 +129,13 @@
       (testing "is an empty list"
         (is (empty? partitioned))))))
 
-(deftest line->cell-test
+(deftest line-cells-test
   (testing "with a valid account number line"
     (let [line (-> "fixtures/accounts.txt"
                    io/resource
                    c/partition-file
                    first)]
       (testing "creates 3x3 cells representing digits"
+        (s/explain ::c/cell (c/line->cells line))
         (is (s/valid?
-             ::c/cell (c/line->cell line)))))))
+             ::c/cell (c/line->cells line)))))))

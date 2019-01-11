@@ -64,14 +64,17 @@
         :account-numbers ::account-numbers
         :invalid ::empty-list))
 
-(defn line->cell
+(defn line->cells
   "creates a 3x3 cell out of a seq (`line`)
   that conforms to the ::account-number-line spec
   "
   [line]
-  nil)
+  (->> line
+       (map #(partition 3 %))
+       (map #(map str %))
+       (apply map list)))
 
-(s/fdef line->cell
+(s/fdef line->cells
   :args (s/cat
          :line ::account-number-line)
   :ret (s/or
