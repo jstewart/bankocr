@@ -2,7 +2,8 @@
   (:require [clojure.spec.test.alpha :as stest]
             [clojure.spec.alpha :as s]
             [clojure.test :refer [deftest testing is are]]
-            [bankocr.core :refer [cell->number] :as c]))
+            [bankocr.core :refer [cell->number partition-file] :as c]
+            [clojure.java.io :as io]))
 
 ;; Textual representations of numbers (OCR cell)
 ;; Attempts made to line the strings up may have the best results
@@ -62,8 +63,9 @@
   :args (s/cat :textual ::textual-digit)
   :ret ::c/cell)
 
-(stest/instrument `textual-to-cell)
-(stest/instrument `cell->number)
+(stest/instrument [`textual-to-cell
+                   `cell->number
+                   `partition-file])
 
 ;; Tests to ensure that numbers 0-9 are correctly identified
 (deftest cell->number_test
@@ -112,3 +114,15 @@
                '(("" "" "")
                  ("" "" "")
                  ("" "" "")))))))
+
+(deftest parition-file-test
+  (testing "with a valid file"
+    (let [partitioned (partition-file
+                      (io/resource "fixtures/accounts.txt"))]
+      (testing "partitions account numbers (27 chars x 3 lines)"
+        (is (= 11 (count partitioned)))
+        (is (= 3 (count (first partitioned))))
+        (is (= 27 (count (ffirst partitioned)))))))
+  (testing "with an invalid file"
+    ;; just flunk for now
+    (is false)))

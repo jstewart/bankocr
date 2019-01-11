@@ -30,3 +30,30 @@
   :fn (s/or :nil nil?
             :range (s/and #(>= (:ret %) 5)
                           #(<= (:ret %) 9))))
+
+;; Read file into lines
+;; Partition by blank line
+;; Should be 3x27 after partitioning
+(s/def ::reader-type
+  (fn [path]
+    (try
+      (clojure.java.io/reader path)
+      true
+      (catch Exception _ false))))
+
+(s/def ::account-number-line
+  (s/coll-of string? :count 3))
+
+(s/def ::account-numbers
+  (s/coll-of ::account-number-line))
+
+(defn partition-file
+  "partitions `file` into textual account
+  number representations"
+  [file]
+  []
+  )
+
+(s/fdef partition-file
+  :args (s/cat :file ::reader-type)
+  :ret ::account-numbers)
