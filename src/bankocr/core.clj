@@ -63,3 +63,17 @@
   :ret (s/or
         :account-numbers ::account-numbers
         :invalid ::empty-list))
+
+(defn line->cell
+  "creates a 3x3 cell out of a seq (`line`)
+  that conforms to the ::account-number-line spec
+  "
+  [line]
+  nil)
+
+(s/fdef line->cell
+  :args (s/cat
+         :line ::account-number-line)
+  :ret (s/or
+        :cell ::cell
+        :invalid ::empty-list))

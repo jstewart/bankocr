@@ -2,7 +2,7 @@
   (:require [clojure.spec.test.alpha :as stest]
             [clojure.spec.alpha :as s]
             [clojure.test :refer [deftest testing is are]]
-            [bankocr.core :refer [cell->number partition-file] :as c]
+            [bankocr.core :as c]
             [clojure.java.io :as io]))
 
 ;; Textual representations of numbers (OCR cell)
@@ -70,61 +70,71 @@
 ;; Tests to ensure that numbers 0-9 are correctly identified
 (deftest cell->number_test
   (testing "detecting a zero"
-    (is (= 0 (cell->number
+    (is (= 0 (c/cell->number
               (textual-to-cell zero)))))
 
   (testing "detecting a one"
-    (is (= 1 (cell->number
+    (is (= 1 (c/cell->number
               (textual-to-cell one)))))
 
   (testing "detecting a two"
-    (is (= 2 (cell->number
+    (is (= 2 (c/cell->number
               (textual-to-cell two)))))
 
   (testing "detecting a three"
-    (is (= 3 (cell->number
+    (is (= 3 (c/cell->number
               (textual-to-cell three)))))
 
   (testing "detecting a four"
-    (is (= 4 (cell->number
+    (is (= 4 (c/cell->number
               (textual-to-cell four)))))
 
   (testing "detecting a five"
-    (is (= 5 (cell->number
+    (is (= 5 (c/cell->number
               (textual-to-cell five)))))
 
   (testing "detecting a six"
-    (is (= 6 (cell->number
+    (is (= 6 (c/cell->number
               (textual-to-cell six)))))
 
   (testing "detecting a seven"
-    (is (= 7 (cell->number
+    (is (= 7 (c/cell->number
               (textual-to-cell seven)))))
 
   (testing "detecting a eight"
-    (is (= 8 (cell->number
+    (is (= 8 (c/cell->number
               (textual-to-cell eight)))))
 
   (testing "detecting a nine"
-    (is (= 9 (cell->number
+    (is (= 9 (c/cell->number
               (textual-to-cell nine)))))
 
   (testing "detecting garbage"
-    (is (nil? (cell->number
+    (is (nil? (c/cell->number
                '(("" "" "")
                  ("" "" "")
                  ("" "" "")))))))
 
 (deftest parition-file-test
   (testing "with a valid file"
-    (let [partitioned (partition-file
+    (let [partitioned (c/partition-file
                       (io/resource "fixtures/accounts.txt"))]
       (testing "partitions account numbers (27 chars x 3 lines)"
         (is (= 11 (count partitioned)))
         (is (= 3 (count (first partitioned))))
         (is (= 27 (count (ffirst partitioned)))))))
   (testing "with an invalid file"
-    (let [partitioned (partition-file
+    (let [partitioned (c/partition-file
                        (io/resource "fixtures/invalid.txt"))]
       (testing "is an empty list"
         (is (empty? partitioned))))))
+
+(deftest line->cell-test
+  (testing "with a valid account number line"
+    (let [line (-> "fixtures/accounts.txt"
+                   io/resource
+                   c/partition-file
+                   first)]
+      (testing "creates 3x3 cells representing digits"
+        (is (s/valid?
+             ::c/cell (c/line->cell line)))))))
