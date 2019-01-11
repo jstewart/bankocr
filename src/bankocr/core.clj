@@ -1,5 +1,6 @@
 (ns bankocr.core
-  (:require [clojure.spec.alpha :as s]))
+  (:require [clojure.java.io :as io]
+            [clojure.spec.alpha :as s]))
 
 (s/def ::cell-row
   (s/coll-of string? :count 3))
@@ -37,7 +38,7 @@
 (s/def ::reader-type
   (fn [path]
     (try
-      (clojure.java.io/reader path)
+      (io/reader path)
       true
       (catch Exception _ false))))
 
@@ -51,8 +52,11 @@
   "partitions `file` into textual account
   number representations"
   [file]
-  []
-  )
+  (->> file
+      io/reader
+      line-seq
+      (partition 4)
+      (map butlast)))
 
 (s/fdef partition-file
   :args (s/cat :file ::reader-type)
