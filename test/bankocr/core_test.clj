@@ -138,4 +138,9 @@
       (testing "creates 3x3 cells representing digits"
         (s/explain ::c/cell (c/line->cells line))
         (is (s/valid?
-             ::c/cell (c/line->cells line)))))))
+             ::c/cell (c/line->cells line))))))
+
+  (testing "with an invalid account number line"
+    (let [invalid-line [[" " "_" " "] ["" 1]]]
+      (testing "is an empty list"
+        (is (= '() (c/line->cells invalid-line)))))))
