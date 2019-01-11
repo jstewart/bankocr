@@ -18,10 +18,11 @@
       true
       (catch Exception _ false))))
 
-(s/def ::account-numbers
-  (s/coll-of
-   (s/and string? #(= 9 (count %)))))
+(s/def ::account-number
+  (s/and string? #(= 9 (count %))))
 
+(s/def ::account-numbers
+  (s/coll-of ::account-number))
 
 (defn cell->number
   "identifies a number from a 3x3 cell of characters"
@@ -75,8 +76,7 @@
 
 (defn line->cells
   "creates a 3x3 cell out of a seq (`line`)
-  that conforms to the ::account-number-line spec
-  "
+  that conforms to the ::account-number-line spec"
   [line]
   (->> line
        (map (fn [cell]
@@ -85,7 +85,6 @@
                    (map #(map str %)))))
        (apply map list)))
 
-
 (s/fdef line->cells
   :args (s/cat
          :line ::account-number-line)
@@ -93,21 +92,40 @@
         :cell ::cell
         :invalid ::empty-list))
 
+(defn account-number-string
+  "creates an account number string from a `cell-group`"
+  [cell-group]
+  (reduce (fn [acct cell]
+            (str acct (cell->number cell)))
+          ""
+          cell-group))
+
+(s/fdef account-number-string
+  :args (s/cat :cell-group ::cell-line)
+  :ret (s/or :account-number ::account-number
+             :invalid nil?))
+
+(defn valid-account?
+  "calculates a checksum for `account-number`
+  to determine validity"
+  [account-number]
+  false
+  )
+
+(s/fdef valid-account?
+  :args (s/cat :account-number ::account-number)
+  :ret boolean?)
+
 (defn file->account-numbers
   "processes a `file` into a collection of account numbers"
   [file]
-  nil)
+  (->> file
+       partition-file
+       (map line->cells)
+       (map account-number-string)))
 
 (s/fdef file->account-numbers
   :args (s/cat :file ::reader-type)
   :ret (s/or
         :account-numbers ::account-numbers
         :invalid ::empty-list))
-
-(comment
-     (->> "fixtures/accounts.txt"
-                  io/resource
-                  partition-file
-                  first
-                  line->cells
-                  ))

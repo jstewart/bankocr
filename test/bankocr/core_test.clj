@@ -8,7 +8,8 @@
 ;; Textual representations of numbers (OCR cell)
 ;; Attempts made to line the strings up may have the best results
 ;; by adjusting to a monospaced font
-(def zero  (str " _ "
+
+:ret boolean?(def zero  (str " _ "
                 "| |"
                 "|_|"))
 
@@ -66,7 +67,9 @@
 (stest/instrument [`c/textual-to-cell
                    `c/cell->number
                    `c/partition-file
-                   `c/file->account-numbers])
+                   `c/file->account-numbers
+                   `c/account-number-string
+                   `c/valid-account?])
 
 ;; Tests to ensure that numbers 0-9 are correctly identified
 (deftest cell->number_test
@@ -136,7 +139,6 @@
                    io/resource
                    c/partition-file
                    first)]
-      (prn line)
       (testing "creates 3x3 cells representing digits"
         (is (s/valid?
              ::c/cell-line (c/line->cells line))))))
@@ -145,6 +147,21 @@
     (let [invalid-line [[" " "_" " "] ["" 1]]]
       (testing "is an empty list"
         (is (= '() (c/line->cells invalid-line)))))))
+
+(deftest account-number-string-test
+  (testing "with a valid cell group"
+    (testing "creates a full account number from a group of cells"
+      (is (= "000000000"
+             (c/account-number-string
+              '(((" " "_" " ") ("|" " " "|") ("|" "_" "|"))
+                ((" " "_" " ") ("|" " " "|") ("|" "_" "|"))
+                ((" " "_" " ") ("|" " " "|") ("|" "_" "|"))
+                ((" " "_" " ") ("|" " " "|") ("|" "_" "|"))
+                ((" " "_" " ") ("|" " " "|") ("|" "_" "|"))
+                ((" " "_" " ") ("|" " " "|") ("|" "_" "|"))
+                ((" " "_" " ") ("|" " " "|") ("|" "_" "|"))
+                ((" " "_" " ") ("|" " " "|") ("|" "_" "|"))
+                ((" " "_" " ") ("|" " " "|") ("|" "_" "|")))))))))
 
 
 ;; With all of the little details out of the way we can get to
@@ -169,3 +186,12 @@
                       io/resource
                       c/file->account-numbers)]
       (is (= expected actual)))))
+
+;; User Story 2
+;; Checksums to ensure valid account numbers
+(deftest user-story-2-test
+  (testing "with a valid account number"
+    (is (true? (c/valid-account? "457508000"))))
+
+  (testing "with an invalid account number"
+    (is (false? (c/valid-account? "664371495")))))
