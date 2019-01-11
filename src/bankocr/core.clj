@@ -47,7 +47,6 @@
   :fn (s/or :nil nil?
             :range #(<= 0 (:ret %) 9)))
 
-
 (s/def ::account-number-line
   (s/coll-of string? :count 3))
 
@@ -63,10 +62,10 @@
   number representations"
   [file]
   (->> file
-      io/reader
-      line-seq
-      (partition 4)
-      (map butlast)))
+       io/reader
+       line-seq
+       (partition 4)
+       (map butlast)))
 
 (s/fdef partition-file
   :args (s/cat :file ::reader-type)
@@ -109,8 +108,14 @@
   "calculates a checksum for `account-number`
   to determine validity"
   [account-number]
-  false
-  )
+  (let [sum (->> account-number
+                 (re-seq #"\d")
+                 (map-indexed #(vector %1 (Integer/parseInt %2)))
+                 (reduce (fn [prev [index curr]]
+                           (+ prev
+                              (* curr (- 9 index))))
+                           0))]
+    (= 0 (mod sum 11))))
 
 (s/fdef valid-account?
   :args (s/cat :account-number ::account-number)
