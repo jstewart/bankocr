@@ -144,3 +144,27 @@
     (let [invalid-line [[" " "_" " "] ["" 1]]]
       (testing "is an empty list"
         (is (= '() (c/line->cells invalid-line)))))))
+
+
+;; With all of the little details out of the way we can get to
+;; fulfilling the first user story.
+;;
+;; User Story 1
+;; Write a program that parses an account number file into actual account numbers.
+(deftest user-story-1-test
+  (testing "it parses a file into a collection of account numbers"
+    (let [expected ["000000000"
+                    "111111111"
+                    "222222222"
+                    "333333333"
+                    "444444444"
+                    "555555555"
+                    "666666666"
+                    "777777777"
+                    "888888888"
+                    "999999999"
+                    "123456789"]
+          actual  (-> "fixtures/accounts.txt"
+                      io/resource
+                      c/file->account-numbers)]
+      (is (= expected actual)))))

@@ -41,7 +41,7 @@
 (s/def ::account-number-line
   (s/coll-of string? :count 3))
 
-(s/def ::account-numbers
+(s/def ::account-number-lines
   (s/coll-of ::account-number-line))
 
 (s/def ::empty-list
@@ -61,7 +61,7 @@
 (s/fdef partition-file
   :args (s/cat :file ::reader-type)
   :ret (s/or
-        :account-numbers ::account-numbers
+        :account-number-lines ::account-number-lines
         :invalid ::empty-list))
 
 (defn line->cells
@@ -79,4 +79,19 @@
          :line ::account-number-line)
   :ret (s/or
         :cell ::cell
+        :invalid ::empty-list))
+
+(s/def ::account-numbers
+  (s/coll-of
+   (s/and string? #(= 9 (count %)))))
+
+(defn file->account-numbers
+  "processes a `file` into a collection of account numbers"
+  [file]
+  nil)
+
+(s/fdef file->account-numbers
+  :args (s/cat :file ::reader-type)
+  :ret (s/or
+        :account-numbers ::account-numbers
         :invalid ::empty-list))
