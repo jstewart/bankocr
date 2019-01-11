@@ -38,13 +38,13 @@
     '((" " "_" " ") (" " " " "|") (" " " " "|")) 7
     '((" " "_" " ") ("|" "_" "|") ("|" "_" "|")) 8
     '((" " "_" " ") ("|" "_" "|") (" " "_" "|")) 9
-    nil))
+    "?"))
 
 (s/fdef cell->number
   :args (s/cat :cell ::cell)
   :ret (s/or :nil nil?
              :numeric number?)
-  :fn (s/or :nil nil?
+  :fn (s/or :illegible #(= "?" %)
             :range #(<= 0 (:ret %) 9)))
 
 (s/def ::account-number-line

@@ -114,10 +114,10 @@
               (textual-to-cell nine)))))
 
   (testing "detecting garbage"
-    (is (nil? (c/cell->number
-               '(("" "" "")
-                 ("" "" "")
-                 ("" "" "")))))))
+    (is (= "?" (c/cell->number
+                '(("" "" "")
+                  ("" "" "")
+                  ("" "" "")))))))
 
 (deftest partition-file-test
   (testing "with a valid file"
@@ -161,7 +161,21 @@
                 ((" " "_" " ") ("|" " " "|") ("|" "_" "|"))
                 ((" " "_" " ") ("|" " " "|") ("|" "_" "|"))
                 ((" " "_" " ") ("|" " " "|") ("|" "_" "|"))
-                ((" " "_" " ") ("|" " " "|") ("|" "_" "|")))))))))
+                ((" " "_" " ") ("|" " " "|") ("|" "_" "|"))))))))
+
+  (testing "with illegible numbers"
+    (testing "it replaces illegible digits with a question mark"
+      (is (= "0?0000000"
+             (c/account-number-string
+              '(((" " "_" " ") ("|" " " "|") ("|" "_" "|"))
+                 ((" " "_" " ") ("|" " " " ") ("_" "_" "|"))
+                 ((" " "_" " ") ("|" " " "|") ("|" "_" "|"))
+                 ((" " "_" " ") ("|" " " "|") ("|" "_" "|"))
+                 ((" " "_" " ") ("|" " " "|") ("|" "_" "|"))
+                 ((" " "_" " ") ("|" " " "|") ("|" "_" "|"))
+                 ((" " "_" " ") ("|" " " "|") ("|" "_" "|"))
+                 ((" " "_" " ") ("|" " " "|") ("|" "_" "|"))
+                 ((" " "_" " ") ("|" " " "|") ("|" "_" "|")))))))))
 
 
 ;; With all of the little details out of the way we can get to
@@ -195,3 +209,12 @@
 
   (testing "with an invalid account number"
     (is (false? (c/valid-account? "664371495")))))
+
+
+;; User Story 3
+;; Write a file with results of the OCR. Illegible digits are replaced with ?.
+;; If there's an incorrect checksum or one of the digits is illegible,
+;; it's indicated in a second column
+(deftest user-story-3-test
+  (testing "writing an output file containing the scan results"
+    (is (true? false))))
