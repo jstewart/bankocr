@@ -18,6 +18,13 @@
       true
       (catch Exception _ false))))
 
+(s/def ::writer-type
+  (fn [path]
+    (try
+      (io/writer path)
+      true
+      (catch Exception _ false))))
+
 (s/def ::account-number
   (s/and string? #(= 9 (count %))))
 
@@ -134,3 +141,32 @@
   :ret (s/or
         :account-numbers ::account-numbers
         :invalid ::empty-list))
+
+(defn account-number-status
+  "returns the status of an `account-number`"
+  [account-number]
+  (cond
+    (re-find #"\?" account-number)        "ILL"
+    (not (valid-account? account-number)) "ERR"
+    :else                                 ""))
+
+(s/fdef account-number-status
+  :args (s/cat :account-number ::account-number)
+  :ret string?)
+
+(defn generate-output-file
+  "generates an `output` file from a set of
+  account numbers contained in `input` "
+  [input output]
+  (as-> input $
+    (file->account-numbers $)
+    (map #(vector % (account-number-status %)) $)
+    (reduce (fn [s [num st]]
+              (str s num "  " st "\n")) "" $)
+    (spit output $)))
+
+(s/fdef generate-output-file
+  :args (s/cat
+         :input ::reader-type
+         :output ::writer-type)
+  :ret nil)

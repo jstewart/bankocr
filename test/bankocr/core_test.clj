@@ -177,6 +177,13 @@
                  ((" " "_" " ") ("|" " " "|") ("|" "_" "|"))
                  ((" " "_" " ") ("|" " " "|") ("|" "_" "|")))))))))
 
+(deftest account-number-status-test
+  (testing "with a valid account number"
+    (is (= "" (c/account-number-status "457508000"))))
+  (testing "with an illegible account number"
+    (is (= "ILL" (c/account-number-status "0?0000000"))))
+  (testing "with an invalid account number"
+    (is (= "ERR" (c/account-number-status "664371495")))))
 
 ;; With all of the little details out of the way we can get to
 ;; fulfilling the first user story.
@@ -210,11 +217,27 @@
   (testing "with an invalid account number"
     (is (false? (c/valid-account? "664371495")))))
 
-
 ;; User Story 3
 ;; Write a file with results of the OCR. Illegible digits are replaced with ?.
 ;; If there's an incorrect checksum or one of the digits is illegible,
 ;; it's indicated in a second column
 (deftest user-story-3-test
-  (testing "writing an output file containing the scan results"
-    (is (true? false))))
+  (testing "writes an output file containing the scan results"
+    (let [input (io/resource "fixtures/user-story-3.txt")
+          output "output.txt"]
+      (c/generate-output-file
+       input
+       (-> output io/file io/writer))
+      (is (.exists (io/file output)))))
+
+  (testing "output file has the expected results"
+    (let [expected ["000000000  "
+                    "111111?11  ILL"
+                    "222222222  ERR"
+                    "333333333  ERR"
+                    "999?99999  ILL"
+                    "123456789  "]
+          output-file  "output.txt"]
+      (is (= expected (->> output-file
+                           io/reader
+                          line-seq))))))
