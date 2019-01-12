@@ -69,7 +69,8 @@
                    `c/partition-file
                    `c/file->account-numbers
                    `c/account-number-string
-                   `c/valid-account?])
+                   `c/valid-account?
+                   `c/generate-output-file])
 
 ;; Tests to ensure that numbers 0-9 are correctly identified
 (deftest cell->number_test
